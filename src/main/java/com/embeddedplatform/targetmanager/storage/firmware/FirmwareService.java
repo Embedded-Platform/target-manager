@@ -1,6 +1,7 @@
 package com.embeddedplatform.targetmanager.storage.firmware;
 
 import com.embeddedplatform.targetmanager.storage.StorageService;
+import com.embeddedplatform.targetmanager.storage.firmware.model.PushResponse;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,9 +19,9 @@ public class FirmwareService extends StorageService {
     public void uploadFirmware(MultipartFile firmware) throws IOException {
         this.uploadFirmware(firmware, "latest");
     }
-    public void uploadFirmware(MultipartFile firmware, String version) throws IOException {
+    public PushResponse uploadFirmware(MultipartFile firmware, String version) throws IOException {
         super.objectType = "firmware.bin";
-        super.uploadObject(firmware, version);
+        return super.uploadObject(firmware, version);
     }
     public InputStreamResource downloadFirmware(){
         return downloadFirmware("latest");

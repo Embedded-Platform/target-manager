@@ -3,6 +3,7 @@ package com.embeddedplatform.targetmanager.storage;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.S3Object;
 import com.embeddedplatform.targetmanager.bucket.S3Service;
+import com.embeddedplatform.targetmanager.storage.firmware.model.PushResponse;
 import com.embeddedplatform.targetmanager.util.VersionUtil;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,7 @@ public class StorageService {
     }
 
 
-    protected void uploadObject(MultipartFile object,String version) throws IOException {
+    protected PushResponse uploadObject(MultipartFile object, String version) throws IOException {
         if(version.equals("latest")){
             Optional<String> lastTagVersionOptional = VersionUtil.getLastTagVersion(getAllTagsVersion());
             version = lastTagVersionOptional
@@ -63,7 +64,9 @@ public class StorageService {
                     .orElse("1.0.0");
         }
         try {
-            this.s3Service.uploadFile(this.getBucketPath(version), object);
+            String path = this.getBucketPath(version);
+            this.s3Service.uploadFile(path, object);
+            return new PushResponse(path);
         }catch (AmazonS3Exception e){
             throw new ResponseStatusException(HttpStatus.valueOf(e.getStatusCode()), e.getMessage());
         }
