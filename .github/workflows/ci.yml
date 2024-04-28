@@ -10,17 +10,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
       - name: Login DockerHub
         env:
           DOCKER_USERNAME: ${{secrets.DOCKER_USER_ORTIZ}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD_ORTIZ}}
         run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
       - name: Build jar
         env:
           JAR_FILE: ${{vars.JAR_FILE}}
