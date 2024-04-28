@@ -23,7 +23,7 @@ jobs:
 
       - name: Build jar
         env:
-          JAR_FILE: ${{JAR_FILE}}
+          JAR_FILE: ${{vars.JAR_FILE}}
         run: mvn package -Dmaven.test.skip
 
       - name: Build docker image
