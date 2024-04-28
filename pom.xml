@@ -8,6 +8,7 @@
 		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.embedded-platform</groupId>
 	<artifactId>target-manager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -44,6 +45,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>target-manager</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
