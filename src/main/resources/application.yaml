@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: target-manager
+server:
+  port: 8081
+  servlet:
+    contextPath: /target-manager/v1/
+aws:
+  access:
+    key: ${AWS_ACCESS_KEY}
+  secret:
+    key: ${AWS_SECRET_KEY}
+  s3:
+    bucket: ${AWS_S3_BUCKET}
