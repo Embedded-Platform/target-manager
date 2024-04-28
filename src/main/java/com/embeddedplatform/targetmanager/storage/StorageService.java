@@ -1,5 +1,6 @@
 package com.embeddedplatform.targetmanager.storage;
 
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.S3Object;
 import com.embeddedplatform.targetmanager.bucket.S3Service;
 import com.embeddedplatform.targetmanager.util.VersionUtil;
@@ -38,13 +39,19 @@ public class StorageService {
     }
 
     private List<String> getAllTagsVersion(){
-        return s3Service.getDirectoryList(this.getPrefixPath()).stream()
-                .map(prefix -> {
+        try {
+            return s3Service.getDirectoryList(this.getPrefixPath()).stream()
+                    .map(prefix -> {
                         String[] parts = prefix.split("/");
                         return parts[parts.length - 1];
-                })
-                .filter(VersionUtil::isVersionTag)
-                .toList();
+                    })
+                    .filter(VersionUtil::isVersionTag)
+                    .toList();
+        }catch (AmazonS3Exception e){
+            throw new ResponseStatusException(HttpStatus.valueOf(e.getStatusCode()), e.getMessage());
+        }
+
+
     }
 
 
@@ -55,8 +62,12 @@ public class StorageService {
                     .map(s -> VersionUtil.addVersion(s, new Integer[]{1, 0, 0}))
                     .orElse("1.0.0");
         }
+        try {
+            this.s3Service.uploadFile(this.getBucketPath(version), object);
+        }catch (AmazonS3Exception e){
+            throw new ResponseStatusException(HttpStatus.valueOf(e.getStatusCode()), e.getMessage());
+        }
 
-        this.s3Service.uploadFile(this.getBucketPath(version), object);
     }
 
     protected InputStreamResource downloadObject(String version){
@@ -68,14 +79,24 @@ public class StorageService {
 
             version = lastTagVersionOptional.get();
         }
-        S3Object object = this.s3Service.getFile(this.getBucketPath(version));
-        return  new InputStreamResource(object.getObjectContent());
+        try{
+            S3Object object = this.s3Service.getFile(this.getBucketPath(version));
+            return  new InputStreamResource(object.getObjectContent());
+        }catch(AmazonS3Exception e){
+            throw new ResponseStatusException(HttpStatus.valueOf(e.getStatusCode()), e.getMessage());
+        }
+
     }
 
     protected void deleteObject(String version){
-        if(version.equals("*"))
-            this.s3Service.deleteDirectory(this.getPrefixPath());
+        try{
+            if(version.equals("*"))
+                this.s3Service.deleteDirectory(this.getPrefixPath());
 
-        this.s3Service.deleteFile(version);
+            this.s3Service.deleteFile(version);
+        }catch(AmazonS3Exception e){
+            throw new ResponseStatusException(HttpStatus.valueOf(e.getStatusCode()), e.getMessage());
+        }
+
     }
 }
